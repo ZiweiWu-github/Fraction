@@ -62,11 +62,12 @@ public class Fraction extends Number implements Comparable<Fraction>, Serializab
 	 * Otherwise, it will print out "wholeNumber&numerator/denominator"
 	 */
 	public void printFraction() {
-		if(numerator == 0)System.out.println(wholeNumber);
-		else if(wholeNumber == 0) System.out.println(numerator + "/" +  denominator);
-		else System.out.println(wholeNumber + "&" + Math.abs(numerator) + "/" +  denominator);
+		System.out.println(this.toString());
 	}
 	
+	/**
+	 * Prints out the fraction as a double.
+	 */
 	public void printDecimal() {
 		System.out.println(doubleValue());
 	}
@@ -88,10 +89,20 @@ public class Fraction extends Number implements Comparable<Fraction>, Serializab
 		}
 	}
 	
+	/**
+	 * Returns a Fraction that is this fraction added with the Fraction f.
+	 * @param f: A Fraction that is not null.
+	 * @return A fraction whose value is this + f
+	 */
 	public Fraction add(Fraction f) {
 		return add(f.wholeNumber, f.numerator, f.denominator);
 	}
 	
+	/**
+	 * Returns a Fraction that is this Fraction subtract the inputed Fraction f.
+	 * @param f: A Fraction that is not null.
+	 * @return A Fraction whose value is this - f
+	 */
 	public Fraction subtract(Fraction f){
 		return add(-f.wholeNumber, -f.numerator, f.denominator);
 	}
@@ -114,23 +125,40 @@ public class Fraction extends Number implements Comparable<Fraction>, Serializab
 		return new Fraction(tempThisNumerator * fNumerator, tempThisDenominator * fDemoninator);
 	}
 	
+	/**
+	 * Returns a Fraction that is this Fraction multiplied by the inputed Fraction f.
+	 * @param f: A Fraction that is not null.
+	 * @return A Fraction whose value is this * f.
+	 */
 	public Fraction multiply(Fraction f) {
 		return this.multiply((f.wholeNumber * f.denominator) + f.numerator, f.denominator);
 	}
 	
+	/**
+	 * Returns a Fraction that is this Fraction divided by the inputed Fraction f.
+	 * @param f: A Fraction that is not null.
+	 * @return A Fraction whose value is this/f.
+	 */
 	public Fraction divide(Fraction f) {
 		if(f.wholeNumber == 0 && f.numerator == 0) throw new Error("Cannot divide by 0!!");
 		return this.multiply(f.denominator, (f.wholeNumber * f.denominator) + f.numerator);
 	}
 	
+	/**
+	 * Return a Fraction that is this Fraction to the xth power.
+	 * @param x: An integer.
+	 * @return A Fraction whose value is this to the xth power.
+	 */
 	public Fraction exponent(int x) {
 		if(x == 0) {
 			if(wholeNumber == 0 && numerator == 0) throw new Error("0 to the 0th power is undefined!!!");
 			else return new Fraction(1,1);
 		}
-		Fraction f = this;
-		for(int i = 1; i<x; ++i) {
-			f = f.multiply(this);
+		Fraction f = (x > 0)? this: new Fraction(denominator, (wholeNumber * denominator)+ numerator);
+		Fraction multiply = f;
+		
+		for(int i = 1; i<Math.abs(x); ++i) {
+			f = f.multiply(multiply);
 		}
 		return f;
 	}
@@ -167,5 +195,14 @@ public class Fraction extends Number implements Comparable<Fraction>, Serializab
 	public long longValue() {
 		return wholeNumber;
 	}
-
+	
+	//The toString() method returns the String that would've been printed out with the printFraction() method
+	@Override
+	public String toString() {
+		String s = "";
+		if(numerator == 0) s = Long.toString(wholeNumber);
+		else if(wholeNumber == 0) s = Long.toString(numerator) + "/" + Long.toString(denominator);
+		else s = Long.toString(wholeNumber) + "&" + Long.toString(numerator) + "/" + Long.toString(denominator);
+		return s;
+	}
 }
