@@ -2,11 +2,17 @@ import java.io.Serializable;
 
 public class Fraction extends Number implements Comparable<Fraction>, Serializable {
 	private static final long serialVersionUID = 6503438752759257933L;
+	
+	/**
+	 * The wholeNumber and numerator should have the same sign (easier math)
+	 * while the denominator should always be positive
+	 */
 	private long wholeNumber;
 	private long numerator;
 	private long denominator;
 	
 	public Fraction(long numerator, long denominator) {
+		if(denominator == 0)throw new Error("You can't divide by 0!");
 		if(denominator <0) throw new Error("Why is the denominator negative?");
 		this.wholeNumber = numerator/denominator;
 		this.numerator = numerator % denominator;
@@ -15,14 +21,13 @@ public class Fraction extends Number implements Comparable<Fraction>, Serializab
 	}
 	
 	public Fraction(long wholeNumber, long numerator, long denominator) {
+		if(denominator == 0)throw new Error("You can't divide by 0!");
 		if(denominator <0) throw new Error("Why is the denominator negative?");
 		if(numerator < 0) throw new Error("Please put the negative sign on the whole number!");
-		this.wholeNumber = Math.abs(wholeNumber);
-		this.wholeNumber += numerator/denominator;
-		this.wholeNumber = (wholeNumber < 0)?-this.wholeNumber:this.wholeNumber;
-		
-		this.numerator = (wholeNumber < 0)?-numerator%denominator : numerator%denominator ;
 		this.denominator = denominator;
+		this.numerator = (wholeNumber < 0)?-numerator:numerator;
+		this.wholeNumber = wholeNumber + (this.numerator / this.denominator);
+		this.numerator %= this.denominator;
 		simplify();
 	}
 	
@@ -39,7 +44,10 @@ public class Fraction extends Number implements Comparable<Fraction>, Serializab
 	}
 	
 	private void simplify() {
-		if(numerator == 0) return;
+		if(numerator == 0) {
+			denominator = 1;
+			return;
+		}
 		long divide = 1;
 		while((divide = GCD(numerator, denominator)) != 1) {
 			numerator/=divide;
@@ -62,10 +70,6 @@ public class Fraction extends Number implements Comparable<Fraction>, Serializab
 	public void printDecimal() {
 		System.out.println(doubleValue());
 	}
-	
-	
-	
-	//Since this is an immutable class, we will return a new Fraction with common algebra
 	
 	//helper function for add and subtract
 	private Fraction add(long fWholeNumber, long fNumerator, long fDenominator) {
@@ -92,17 +96,22 @@ public class Fraction extends Number implements Comparable<Fraction>, Serializab
 		return add(-f.wholeNumber, -f.numerator, f.denominator);
 	}
 	
+	//helper function for multiply and divide
 	private Fraction multiply(long fNumerator, long fDemoninator) {
 		long tempThisNumerator = (this.wholeNumber * this.denominator) + this.numerator;
+		long tempThisDenominator = this.denominator;
 		
-		Fraction tempSwitch1 = new Fraction(tempThisNumerator, fDemoninator);
-		Fraction tempSwitch2 = new Fraction(fNumerator, this.denominator);
+		long divide = 1;
+		while(tempThisNumerator != 0 &&(divide = GCD(tempThisNumerator, fDemoninator))!=1) {
+			tempThisNumerator/=divide;
+			fDemoninator /=divide;
+		}
+		while(fNumerator != 0 && (divide = GCD(fNumerator, tempThisDenominator))!= 1) {
+			fNumerator/=divide;
+			tempThisDenominator/=divide;
+		}
 		
-		//attempt for further simplification before multiplying
-		tempThisNumerator = (tempSwitch1.wholeNumber * tempSwitch1.denominator) + tempSwitch1.numerator;
-		long tempOtherNumerator = (tempSwitch2.wholeNumber * tempSwitch2.denominator) + tempSwitch2.numerator;
-		
-		return new Fraction(tempThisNumerator * tempOtherNumerator, tempSwitch1.denominator * tempSwitch2.denominator);
+		return new Fraction(tempThisNumerator * fNumerator, tempThisDenominator * fDemoninator);
 	}
 	
 	public Fraction multiply(Fraction f) {
@@ -110,13 +119,14 @@ public class Fraction extends Number implements Comparable<Fraction>, Serializab
 	}
 	
 	public Fraction divide(Fraction f) {
+		if(f.wholeNumber == 0 && f.numerator == 0) throw new Error("Cannot divide by 0!!");
 		return this.multiply(f.denominator, (f.wholeNumber * f.denominator) + f.numerator);
 	}
 	
 	public Fraction exponent(int x) {
 		if(x == 0) {
 			if(wholeNumber == 0 && numerator == 0) throw new Error("0 to the 0th power is undefined!!!");
-			else return new Fraction(1,0,1);
+			else return new Fraction(1,1);
 		}
 		Fraction f = this;
 		for(int i = 1; i<x; ++i) {
