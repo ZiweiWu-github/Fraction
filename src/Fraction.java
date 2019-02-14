@@ -154,7 +154,7 @@ public class Fraction extends Number implements Comparable<Fraction>, Serializab
 			if(wholeNumber == 0 && numerator == 0) throw new Error("0 to the 0th power is undefined!!!");
 			else return new Fraction(1,1);
 		}
-		Fraction f = (x > 0)? this: new Fraction(denominator, (wholeNumber * denominator)+ numerator);
+		Fraction f = (x > 0)? this: new Fraction((wholeNumber < 0 || numerator <0)?-denominator:denominator, Math.abs((wholeNumber * denominator)+ numerator));
 		Fraction multiply = f;
 		
 		for(int i = 1; i<Math.abs(x); ++i) {
@@ -178,7 +178,7 @@ public class Fraction extends Number implements Comparable<Fraction>, Serializab
 	public double doubleValue() {
 		double d = Math.abs(wholeNumber);
 		d += (Math.abs(numerator)*1.0/denominator);
-		return (numerator < 0)?-d:d;
+		return (wholeNumber < 0 || numerator < 0)?-d:d;
 	}
 
 	@Override

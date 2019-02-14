@@ -2,12 +2,13 @@
 public class Main {
 
 	public static void main(String[] args) {
-		Fraction fraction = new Fraction(1,2,3);
-		//fraction = fraction.exponent(-2);
-//		fraction = fraction.multiply(new Fraction(22, 7));
-		//fraction = fraction.add(new Fraction(22, 6));
-		fraction.printFraction();
-		fraction.printDecimal();
+		double test1 = 0.1;
+		double test2 = 0.2;
+		System.out.println(test1 + test2); //floating point errors! completely unacceptable!!
+		
+		Fraction fTest1 = new Fraction(1,10);
+		Fraction fTest2 = new Fraction(2,10);
+		System.out.println(fTest1.add(fTest2).doubleValue()); //clean, precise values!!
 	}
 
 }
