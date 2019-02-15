@@ -21,9 +21,7 @@ public class Main {
 //		
 //		Fraction fTest1 = new Fraction(1,10);
 //		Fraction fTest2 = new Fraction(2,10);
-//		System.out.println(fTest1.add(fTest2).doubleValue()); //clean, precise values!!
-//		
-//		new BigFraction(1,2).exponent(0).printFraction();
+//		System.out.println(fTest1.subtract(fTest2).doubleValue()); //clean, precise values!!
 		
 		//Euler's number with BigFraction
 		BigFraction f = new BigFraction(BigInteger.ONE, factorial(0));

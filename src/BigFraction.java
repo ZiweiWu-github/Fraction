@@ -1,8 +1,9 @@
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
-public final class BigFraction extends Number implements Comparable<BigFraction>{
+public final class BigFraction extends Number implements Comparable<BigFraction>, Serializable{
 	private static final long serialVersionUID = 4519423672338393848L;
 	
 	BigInteger numerator, denominator;
@@ -93,6 +94,7 @@ public final class BigFraction extends Number implements Comparable<BigFraction>
 	}
 	
 	public BigFraction divide(BigFraction f) {
+		if(f.numerator.compareTo(BigInteger.ZERO) == 0)throw new Error("Cannot divide by 0!");
 		return this.multiply(
 			(f.numerator.compareTo(BigInteger.ZERO) == -1)?f.denominator.multiply(BigInteger.valueOf(-1)):f.denominator,
 			f.numerator.abs());

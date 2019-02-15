@@ -7,15 +7,13 @@ public final class Fraction extends Number implements Comparable<Fraction>, Seri
 	 * The wholeNumber and numerator should have the same sign (easier math)
 	 * while the denominator should always be positive
 	 */
-	private long wholeNumber;
 	private long numerator;
 	private long denominator;
 	
 	public Fraction(long numerator, long denominator) {
 		if(denominator == 0)throw new Error("You can't divide by 0!");
 		if(denominator <0) throw new Error("Why is the denominator negative?");
-		this.wholeNumber = numerator/denominator;
-		this.numerator = numerator % denominator;
+		this.numerator = numerator;
 		this.denominator = denominator;
 		simplify();
 	}
@@ -25,9 +23,7 @@ public final class Fraction extends Number implements Comparable<Fraction>, Seri
 		if(denominator <0) throw new Error("Why is the denominator negative?");
 		if(numerator < 0) throw new Error("Please put the negative sign on the whole number!");
 		this.denominator = denominator;
-		this.numerator = (wholeNumber < 0)?-numerator:numerator;
-		this.wholeNumber = wholeNumber + (this.numerator / this.denominator);
-		this.numerator %= this.denominator;
+		this.numerator = numerator + (wholeNumber * denominator);
 		simplify();
 	}
 	
@@ -74,19 +70,13 @@ public final class Fraction extends Number implements Comparable<Fraction>, Seri
 	}
 	
 	//helper function for add and subtract
-	private Fraction add(long fWholeNumber, long fNumerator, long fDenominator) {
+	private Fraction add(long fNumerator, long fDenominator) {
 		if(this.denominator == fDenominator) {
-			return new Fraction(this.wholeNumber + fWholeNumber, 
-					this.numerator + fNumerator, this.denominator);
+			return new Fraction(this.numerator + fNumerator, this.denominator);
 		}
 		else {
-			long tempWholeNum  = this.wholeNumber + fWholeNumber;
-			long tempNumerator = (tempWholeNum==0)?(this.numerator * fDenominator) + (fNumerator * this.denominator):
-				Math.abs((this.numerator * fDenominator) + (fNumerator * this.denominator));
-			
-			return (tempWholeNum == 0)?
-				new Fraction(tempNumerator, fDenominator * this.denominator):
-				new Fraction(tempWholeNum, tempNumerator, fDenominator * this.denominator);
+			return new Fraction((this.numerator * fDenominator) + (fNumerator * this.denominator), 
+					this.denominator * fDenominator);
 		}
 	}
 	
@@ -96,7 +86,7 @@ public final class Fraction extends Number implements Comparable<Fraction>, Seri
 	 * @return A fraction whose value is this + f
 	 */
 	public Fraction add(Fraction f) {
-		return add(f.wholeNumber, f.numerator, f.denominator);
+		return add(f.numerator, f.denominator);
 	}
 	
 	/**
@@ -105,12 +95,12 @@ public final class Fraction extends Number implements Comparable<Fraction>, Seri
 	 * @return A Fraction whose value is this - f
 	 */
 	public Fraction subtract(Fraction f){
-		return add(-f.wholeNumber, -f.numerator, f.denominator);
+		return add(-f.numerator, f.denominator);
 	}
 	
 	//helper function for multiply and divide
 	private Fraction multiply(long fNumerator, long fDemoninator) {
-		long tempThisNumerator = (this.wholeNumber * this.denominator) + this.numerator;
+		long tempThisNumerator = this.numerator;
 		long tempThisDenominator = this.denominator;
 		
 		long divide = 1;
@@ -132,7 +122,7 @@ public final class Fraction extends Number implements Comparable<Fraction>, Seri
 	 * @return A Fraction whose value is this * f.
 	 */
 	public Fraction multiply(Fraction f) {
-		return this.multiply((f.wholeNumber * f.denominator) + f.numerator, f.denominator);
+		return this.multiply(f.numerator, f.denominator);
 	}
 	
 	/**
@@ -141,8 +131,8 @@ public final class Fraction extends Number implements Comparable<Fraction>, Seri
 	 * @return A Fraction whose value is this/f.
 	 */
 	public Fraction divide(Fraction f) {
-		if(f.wholeNumber == 0 && f.numerator == 0) throw new Error("Cannot divide by 0!!");
-		return this.multiply(f.denominator, (f.wholeNumber * f.denominator) + f.numerator);
+		if(f.numerator == 0)throw new Error("You can't divide by zero!!");
+		return this.multiply((f.numerator < 0)?-f.denominator:f.denominator, Math.abs(f.numerator));
 	}
 	
 	/**
@@ -152,10 +142,10 @@ public final class Fraction extends Number implements Comparable<Fraction>, Seri
 	 */
 	public Fraction exponent(int x) {
 		if(x == 0) {
-			if(wholeNumber == 0 && numerator == 0) throw new Error("0 to the 0th power is undefined!!!");
+			if(numerator == 0) throw new Error("0 to the 0th power is undefined!!!");
 			else return new Fraction(1,1);
 		}
-		Fraction f = (x > 0)? this: new Fraction((wholeNumber < 0 || numerator <0)?-denominator:denominator, Math.abs((wholeNumber * denominator)+ numerator));
+		Fraction f = (x > 0)? this: new Fraction((numerator <0)?-denominator:denominator, Math.abs(numerator));
 		Fraction multiply = f;
 		
 		for(int i = 1; i<Math.abs(x); ++i) {
@@ -176,9 +166,9 @@ public final class Fraction extends Number implements Comparable<Fraction>, Seri
 	//The below methods are for the Number class
 	@Override
 	public double doubleValue() {
-		double d = Math.abs(wholeNumber);
-		d += (Math.abs(numerator)*1.0/denominator);
-		return (wholeNumber < 0 || numerator < 0)?-d:d;
+		double d = Math.abs(numerator/denominator);
+		d += ((numerator*1.0)/denominator);
+		return d;
 	}
 
 	@Override
@@ -188,21 +178,22 @@ public final class Fraction extends Number implements Comparable<Fraction>, Seri
 
 	@Override
 	public int intValue() {
-		return (int) wholeNumber;
+		return (int) (numerator/denominator);
 	}
 
 	@Override
 	public long longValue() {
-		return wholeNumber;
+		return numerator/denominator;
 	}
 	
 	//The toString() method returns the String that would've been printed out with the printFraction() method
 	@Override
 	public String toString() {
-		String s = "";
+		String s;
+		long wholeNumber = numerator/denominator;
 		if(numerator == 0) s = Long.toString(wholeNumber);
 		else if(wholeNumber == 0) s = Long.toString(numerator) + "/" + Long.toString(denominator);
-		else s = Long.toString(wholeNumber) + "&" + Long.toString(numerator) + "/" + Long.toString(denominator);
+		else s = Long.toString(wholeNumber) + "&" + Long.toString(numerator%denominator) + "/" + Long.toString(denominator);
 		return s;
 	}
 }
