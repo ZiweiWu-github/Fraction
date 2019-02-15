@@ -1,6 +1,6 @@
 import java.io.Serializable;
 
-public class Fraction extends Number implements Comparable<Fraction>, Serializable {
+public final class Fraction extends Number implements Comparable<Fraction>, Serializable {
 	private static final long serialVersionUID = 6503438752759257933L;
 	
 	/**
@@ -48,6 +48,7 @@ public class Fraction extends Number implements Comparable<Fraction>, Serializab
 			denominator = 1;
 			return;
 		}
+		if(numerator == 1 || denominator == 1)return;
 		long divide = 1;
 		while((divide = GCD(numerator, denominator)) != 1) {
 			numerator/=divide;
@@ -162,7 +163,6 @@ public class Fraction extends Number implements Comparable<Fraction>, Serializab
 		}
 		return f;
 	}
-	
 	
 	//implement Comparable<Fraction>
 	@Override
